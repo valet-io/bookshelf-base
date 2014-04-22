@@ -1,8 +1,19 @@
 {
   "name": "bookshelf-base",
+  "private": true,
   "version": "0.0.0",
   "description": "Our base model layer built on Bookshelf",
   "main": "index.js",
+  "peerDependencies": {
+    "bookshelf": "0.6.x"
+  },
+  "dependencies": {
+    "joi": "spumko/joi#d4fd231fbb4f34bf9202dbe05b6418ffcb973006",
+    "bluebird": "1.2.x"
+  },
+  "devDependencies": {
+    "bookshelf": "0.6.x"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
