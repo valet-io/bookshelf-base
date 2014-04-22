@@ -1,0 +1,23 @@
+{
+  "name": "bookshelf-base",
+  "version": "0.0.0",
+  "description": "Our base model layer built on Bookshelf",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/valet-io/bookshelf-base.git"
+  },
+  "keywords": [
+    "model",
+    "bookshelf"
+  ],
+  "author": "Ben Drucker <bvdrucker@gmail.com> (http://www.bendrucker.me/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/valet-io/bookshelf-base/issues"
+  },
+  "homepage": "https://github.com/valet-io/bookshelf-base"
+}
