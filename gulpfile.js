@@ -10,7 +10,7 @@ gulp.task('lint', function () {
     .pipe(plugins.jshint.reporter('fail'));
 });
 
-gulp.task('test', function (cb) {
+gulp.task('test', ['lint'], function (cb) {
   require('test-setup');
   gulp.src('src/*.js')
     .pipe(plugins.istanbul())
