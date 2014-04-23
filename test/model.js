@@ -2,7 +2,7 @@
 
 var Joi = require('joi');
 
-var Model = require('../src')(require('bookshelf/dialects/sql/model')).Model;
+var Model = require('../src')(require('bookshelf/dialects/sql/model')).Model.extend();
 
 describe('Model', function () {
 
@@ -15,33 +15,71 @@ describe('Model', function () {
     expect(model).to.have.property('hasTimestamps').that.is.true;
   });
 
+  describe('Model#extend', function () {
+
+    it('applies the default behavior', function () {
+      expect(Model).to.have.property('extend');
+    });
+
+    it('creates an empty array of validators', function () {
+      expect(Model.prototype)
+        .to.have.property('validators')
+        .that.is.an.instanceOf(Array)
+        .with.property('length', 0);
+    });
+
+  });
+
   describe('Validation', function () {
 
-    beforeEach(function () {
-      sinon.stub(Joi, 'validate');
-    });
-
-    afterEach(function () {
-      Joi.validate.restore();
-    });
-
-    it('validates on `saving`', function () {
-      sinon.spy(Model.prototype, '_validate');
-      model = new Model();
-      return model.triggerThen('saving').finally(function () {
-        expect(model._validate).to.have.been.calledOnce;
+    it('triggers validation on saving', function () {
+      sinon.stub(model, 'validate');
+      return model.triggerThen('saving', model).finally(function () {
+        expect(model.validate).to.have.been.calledOn(model);
       });
     });
 
-    it('validates using a Joi schema as model.schema', function () {
-      return model._validate().finally(function () {
-        expect(Joi.validate).to.have.been.calledWithMatch(model.toJSON({shallow: true}), model.schema);
+    it('can override validation with options.validate === false', function () {
+      sinon.stub(model, 'validate');
+      return model.triggerThen('saving', model, null, {validate: false}).finally(function () {
+        expect(model.validate).to.not.have.been.called;
       });
     });
 
-    it('skips schema validation if !model.schema');
+    describe('#validate', function () {
 
-    it('calls model#validate if available');
+      beforeEach(function () {
+        sinon.spy(Joi, 'validate');
+      });
+
+      afterEach(function () {
+        Joi.validate.restore();
+      });
+
+      it('validates using a Joi schema as model.schema', function () {
+        model.schema = {};
+        sinon.spy(model, 'toJSON');
+        return model.validate().finally(function () {
+          expect(model.toJSON).to.have.been.calledWithMatch({shallow: true});
+          expect(Joi.validate).to.have.been.calledWithMatch(model.toJSON.firstCall.returnValue, model.schema);
+        });
+      });
+
+      it('skips schema validation if !model.schema', function () {
+        return model.validate().finally(function () {
+          expect(Joi.validate).to.not.have.been.called;
+        });
+      });
+
+      it('calls all custom validators', function () {
+        var validator = sinon.spy();
+        model.validators.push(validator);
+        return model.validate().finally(function () {
+          expect(validator).to.have.been.called;
+        });
+      });
+
+    });    
 
   });
 

@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = function (Bookshelf) {
-  require('./model')(Bookshelf.Model);
-  require('./collection')(Bookshelf.Collection);
+  Bookshelf.Model = require('./model')(Bookshelf.Model);
+  Bookshelf.Collection = require('./collection')(Bookshelf.Collection);
   return Bookshelf;
 };

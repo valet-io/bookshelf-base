@@ -12,6 +12,7 @@ gulp.task('lint', function () {
 
 gulp.task('test', ['lint'], function (cb) {
   require('test-setup');
+  require('sinon-as-promised');
   gulp.src('src/*.js')
     .pipe(plugins.istanbul())
     .on('end', function () {
