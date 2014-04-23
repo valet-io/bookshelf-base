@@ -2,6 +2,7 @@
 
 var Promise = require('bluebird');
 var Joi     = require('joi');
+var _       = require('lodash');
 
 var internals = {};
 
@@ -20,8 +21,17 @@ module.exports = function (BaseModel) {
     },
     hasTimestamps: true,
     validate: function () {
-      return this.schema ? Promise.promisify(Joi.validate)(this.toJSON({shallow: true}), this.schema) : Promise
+      var value = _.omit(this.toJSON({shallow: true}), 'created_at', 'updated_at');
+      var schema = this.schema;
+      return Promise
         .bind(this)
+        .then(function () {
+          if (schema) return Promise.promisify(Joi.validate)(value, schema);
+        })
+        .error(function (e) {
+          throw e.cause;
+        })
+        .then(this.set)
         .return(this.validators)
         .map(function (validator) {
           return validator.call(this);

@@ -65,6 +65,40 @@ describe('Model', function () {
         });
       });
 
+      it('excludes timestamps from the model representation', function () {
+        model.schema = {
+          data: Joi.any()
+        };
+        model.set('created_at', new Date());
+        model.set('data', {});
+        return model.validate().finally(function () {
+          expect(Joi.validate.firstCall.args[0]).deep.equal({
+            data: {}
+          });
+        });
+      });
+
+      it('sets the validated data on the model', function () {
+        model.schema = {
+          numeric: Joi.number()
+        };
+        model.set('numeric', '123');
+        sinon.spy(model, 'set');
+        return model.validate().finally(function () {
+          expect(model.set).to.have.been.calledWithMatch({
+            numeric: 123
+          });
+          expect(model.get('numeric')).to.equal(123);
+        });
+      });
+
+      it('rejects if validation fails', function () {
+        model.schema = {
+          required: Joi.any().required()
+        };
+        return expect(model.validate()).to.be.rejectedWith(/required/);
+      });
+
       it('skips schema validation if !model.schema', function () {
         return model.validate().finally(function () {
           expect(Joi.validate).to.not.have.been.called;
@@ -77,6 +111,10 @@ describe('Model', function () {
         return model.validate().finally(function () {
           expect(validator).to.have.been.calledOn(model);
         });
+      });
+
+      it('resolves with the model', function () {
+        return expect(model.validate()).to.eventually.equal(model);
       });
 
     });    
