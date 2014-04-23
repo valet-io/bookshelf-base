@@ -33,15 +33,20 @@ describe('Model', function () {
   describe('Validation', function () {
 
     it('triggers validation on saving', function () {
+      var options = {
+        validation: {}
+      };
       sinon.stub(model, 'validate');
-      return model.triggerThen('saving', model).finally(function () {
-        expect(model.validate).to.have.been.calledOn(model);
+      return model.triggerThen('saving', model, null, options).finally(function () {
+        expect(model.validate)
+          .to.have.been.calledOn(model)
+          .and.calledWith(options.validation);
       });
     });
 
-    it('can override validation with options.validate === false', function () {
+    it('can override validation with options.validation === false', function () {
       sinon.stub(model, 'validate');
-      return model.triggerThen('saving', model, null, {validate: false}).finally(function () {
+      return model.triggerThen('saving', model, null, {validation: false}).finally(function () {
         expect(model.validate).to.not.have.been.called;
       });
     });
@@ -58,10 +63,11 @@ describe('Model', function () {
 
       it('validates using a Joi schema as model.schema', function () {
         model.schema = {};
+        var options = {};
         sinon.spy(model, 'toJSON');
-        return model.validate().finally(function () {
+        return model.validate(options).finally(function () {
           expect(model.toJSON).to.have.been.calledWithMatch({shallow: true});
-          expect(Joi.validate).to.have.been.calledWithMatch(model.toJSON.firstCall.returnValue, model.schema);
+          expect(Joi.validate).to.have.been.calledWithMatch(model.toJSON.firstCall.returnValue, model.schema, options);
         });
       });
 
