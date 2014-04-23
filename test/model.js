@@ -75,7 +75,7 @@ describe('Model', function () {
         var validator = sinon.spy();
         model.validators.push(validator);
         return model.validate().finally(function () {
-          expect(validator).to.have.been.called;
+          expect(validator).to.have.been.calledOn(model);
         });
       });
 
