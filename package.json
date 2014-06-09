@@ -8,8 +8,8 @@
     "bookshelf": "0.6.x"
   },
   "dependencies": {
-    "joi": "4.0.x",
-    "bluebird": "1.2.x",
+    "joi": "4.6.x",
+    "bluebird": "2.0.x",
     "lodash": "2.4.x"
   },
   "devDependencies": {
