@@ -66,21 +66,7 @@ describe('Model', function () {
         var options = {};
         sinon.spy(model, 'toJSON');
         return model.validate(options).finally(function () {
-          expect(model.toJSON).to.have.been.calledWithMatch({shallow: true});
-          expect(Joi.validate).to.have.been.calledWithMatch(model.toJSON.firstCall.returnValue, model.schema, options);
-        });
-      });
-
-      it('excludes timestamps from the model representation', function () {
-        model.schema = {
-          data: Joi.any()
-        };
-        model.set('created_at', new Date());
-        model.set('data', {});
-        return model.validate().finally(function () {
-          expect(Joi.validate.firstCall.args[0]).deep.equal({
-            data: {}
-          });
+          expect(Joi.validate).to.have.been.calledWith(model.attributes, model.schema, options);
         });
       });
 

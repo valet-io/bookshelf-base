@@ -22,12 +22,12 @@ module.exports = function (BaseModel) {
     hasTimestamps: true,
     validate: function (options) {
       options = options || {};
-      var value = _.omit(this.toJSON({shallow: true}), 'created_at', 'updated_at');
       var schema = this.schema;
       return Promise
         .bind(this)
         .then(function () {
-          if (schema) return Promise.promisify(Joi.validate)(value, schema, options);
+          if (!schema) return;
+          return Promise.promisify(Joi.validate)(this.attributes, this.schema, options);
         })
         .error(function (e) {
           throw e.cause;
