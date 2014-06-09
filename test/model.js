@@ -30,6 +30,14 @@ describe('Model', function () {
 
   });
 
+  describe('Parsing and Formatting', function () {
+
+    it('parses JSON columns to objects');
+
+    it('stringifies JSON columns on format');
+
+  });
+
   describe('Validation', function () {
 
     it('triggers validation on saving', function () {
@@ -117,7 +125,7 @@ describe('Model', function () {
 
     it('mixes in event methods on the constructor');
 
-    it('can proxy a set of events to the constructor');
+    it('emits lifecyle events on the constructor');
 
   });
 
