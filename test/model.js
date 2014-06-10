@@ -29,11 +29,30 @@ describe('Model', function () {
 
   });
 
-  describe('Parsing and Formatting', function () {
+  describe('#parse', function () {
 
-    it('parses JSON columns to objects');
+    it('parses JSON columns to objects', function () {
+      var data = {
+        foo: 'bar'
+      };
+      model.json = ['json_col'];
+      expect(model.parse({
+        json_col: JSON.stringify(data)
+      }))
+      .to.have.a.property('json_col')
+      .that.deep.equals(data);
+    });
 
-    it('stringifies JSON columns on format');
+    it('ignores normal columns', function () {
+      expect(model.parse({
+        normal: 'data'
+      }))
+      .to.have.a.property('normal', 'data');
+    });
+
+    it('can handle no JSON columns defined', function () {
+      expect(model.parse).to.not.throw();
+    });
 
   });
 

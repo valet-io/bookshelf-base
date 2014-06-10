@@ -2,7 +2,6 @@
 
 var Promise = require('bluebird');
 var Joi     = require('joi');
-var _       = require('lodash');
 
 var internals = {};
 
@@ -13,11 +12,23 @@ internals.registerValidation = function (model) {
   });
 };
 
+internals.isJSONColumn = function (model, column) {
+  return model.json && model.json.indexOf(column) !== -1;
+};
+
 module.exports = function (BaseModel) {
   var Model = BaseModel.extend({
     constructor: function () {
       BaseModel.apply(this, arguments);
       internals.registerValidation(this);
+    },
+    parse: function (attributes) {
+      for (var column in attributes) {
+        if (internals.isJSONColumn(this, column)) {
+          attributes[column] = JSON.parse(attributes[column]);
+        }
+      }
+      return attributes;
     },
     hasTimestamps: true,
     validate: function (options) {
