@@ -1,7 +1,7 @@
 {
   "name": "bookshelf-base",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Our base model layer built on Bookshelf",
   "main": "index.js",
   "peerDependencies": {
@@ -26,7 +26,7 @@
     "test-setup": "git://github.com/valet-io/test-setup"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "gulp test"
   },
   "repository": {
     "type": "git",
