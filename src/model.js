@@ -2,6 +2,7 @@
 
 var Promise = require('bluebird');
 var Joi     = require('joi');
+var _       = require('lodash');
 
 var internals = {};
 
@@ -16,11 +17,23 @@ internals.isJSONColumn = function (model, column) {
   return model.json && model.json.indexOf(column) !== -1;
 };
 
+internals.eavesdrop = function (model, Model) {
+  var p = model.proxy;
+  if (p) {
+    model.on('all', function (event) {
+      if (p === true || (Array.isArray(p) && p.indexOf(event) !== -1)) {
+        return Model.triggerThen.apply(Model, arguments);
+      }
+    }, model);
+  }
+};
+
 module.exports = function (BaseModel) {
   var Model = BaseModel.extend({
     constructor: function () {
       BaseModel.apply(this, arguments);
       internals.registerValidation(this);
+      internals.eavesdrop(this, this.constructor);
     },
     parse: function (attributes) {
       for (var column in attributes) {
@@ -38,6 +51,7 @@ module.exports = function (BaseModel) {
       }
       return attributes;
     },
+    proxy: true,
     hasTimestamps: true,
     validate: function (options) {
       options = options || {};
@@ -59,6 +73,8 @@ module.exports = function (BaseModel) {
         .return(this);
     }
   });
+
+  _.extend(Model, require('bookshelf/lib/base/events'));
 
   Model.extend = function () {
     var child = BaseModel.extend.apply(this, arguments);

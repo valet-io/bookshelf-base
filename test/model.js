@@ -1,9 +1,13 @@
 'use strict';
 
-var Joi   = require('joi');
-var Model = require('./helpers/bookshelf').Model.extend(); 
+var Joi   = require('joi'); 
 
 describe('Model', function () {
+
+  var Model;
+  beforeEach(function () {
+    Model = require('./helpers/bookshelf').Model.extend();
+  });
 
   var model;
   beforeEach(function () {
@@ -168,9 +172,39 @@ describe('Model', function () {
 
   describe('Events', function () {
 
-    it('mixes in event methods on the constructor');
+    it('mixes in event methods on the constructor', function () {
+      expect(Model).to.respondTo('triggerThen');
+    });
 
-    it('emits lifecyle events on the constructor');
+    it('emits lifecyle events on the constructor', function () {
+      var spy = sinon.spy();
+      Model.on('proxyEvent', spy);
+      model.trigger('proxyEvent', model);
+      expect(spy).to.have.been.calledWith(model);
+    });
+
+    it('can emit only select events', function () {
+      var registered = sinon.spy();
+      var ignored = sinon.spy();
+      Model.prototype.proxy = ['p1', 'p2'];
+      model = new Model();
+      Model.on('p1 p2', registered);
+      Model.on('p3', ignored);
+      model.trigger('p1 p2 p3', model);
+      expect(registered)
+        .to.have.been.calledTwice
+        .and.calledWith(model);
+      expect(ignored).to.not.have.been.called;
+    });
+
+    it('can disable proxying', function () {
+      var spy = sinon.spy();
+      Model.prototype.proxy = false;
+      model = new Model();
+      Model.on('e', spy);
+      model.trigger('e');
+      expect(spy).to.not.have.been.called;
+    });
 
   });
 
