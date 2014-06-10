@@ -30,6 +30,14 @@ module.exports = function (BaseModel) {
       }
       return attributes;
     },
+    format: function (attributes) {
+      for (var column in attributes) {
+        if (internals.isJSONColumn(this, column)) {
+          attributes[column] = JSON.stringify(attributes[column]);
+        }
+      }
+      return attributes;
+    },
     hasTimestamps: true,
     validate: function (options) {
       options = options || {};

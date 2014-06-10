@@ -56,6 +56,33 @@ describe('Model', function () {
 
   });
 
+  describe('#format', function () {
+
+    it('stringifies JSON columns', function () {
+      var data = {
+        foo: 'bar'
+      };
+      model.json = ['json_col'];
+      expect(model.format({
+        json_col: data
+      }))
+      .to.have.a.property('json_col')
+      .that.equals(JSON.stringify(data));
+    });
+
+    it('ignores normal columns', function () {
+      expect(model.format({
+        normal: 'data'
+      }))
+      .to.have.a.property('normal', 'data');
+    });
+
+    it('can handle no JSON columns defined', function () {
+      expect(model.format).to.not.throw();
+    });
+
+  });
+
   describe('Validation', function () {
 
     it('triggers validation on saving', function () {
