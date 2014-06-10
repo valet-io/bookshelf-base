@@ -1,8 +1,7 @@
 'use strict';
 
-var Joi = require('joi');
-
-var Model = require('../src')(require('bookshelf/dialects/sql/model')).Model.extend();
+var Joi   = require('joi');
+var Model = require('./helpers/bookshelf').Model.extend(); 
 
 describe('Model', function () {
 
