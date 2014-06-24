@@ -13,10 +13,6 @@ internals.registerValidation = function (model) {
   });
 };
 
-internals.isJSONColumn = function (model, column) {
-  return model.json && model.json.indexOf(column) !== -1;
-};
-
 internals.eavesdrop = function (model, Model) {
   var p = model.proxy;
   if (p) {
@@ -34,22 +30,6 @@ module.exports = function (BaseModel) {
       BaseModel.apply(this, arguments);
       internals.registerValidation(this);
       internals.eavesdrop(this, this.constructor);
-    },
-    parse: function (attributes) {
-      for (var column in attributes) {
-        if (internals.isJSONColumn(this, column)) {
-          attributes[column] = JSON.parse(attributes[column]);
-        }
-      }
-      return attributes;
-    },
-    format: function (attributes) {
-      for (var column in attributes) {
-        if (internals.isJSONColumn(this, column)) {
-          attributes[column] = JSON.stringify(attributes[column]);
-        }
-      }
-      return attributes;
     },
     proxy: true,
     hasTimestamps: true,
