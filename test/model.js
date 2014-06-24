@@ -43,7 +43,7 @@ describe('Model', function () {
         validation: {}
       };
       sinon.stub(model, 'validate');
-      return model.triggerThen('saving', model, null, options).finally(function () {
+      return model.triggerThen('saving', model, null, options).then(function () {
         expect(model.validate)
           .to.have.been.calledOn(model)
           .and.calledWith(options.validation);
@@ -52,7 +52,7 @@ describe('Model', function () {
 
     it('can override validation with options.validation === false', function () {
       sinon.stub(model, 'validate');
-      return model.triggerThen('saving', model, null, {validation: false}).finally(function () {
+      return model.triggerThen('saving', model, null, {validation: false}).then(function () {
         expect(model.validate).to.not.have.been.called;
       });
     });
@@ -70,9 +70,23 @@ describe('Model', function () {
       it('validates using a Joi schema as model.schema', function () {
         model.schema = {};
         var options = {};
-        sinon.spy(model, 'toJSON');
-        return model.validate(options).finally(function () {
+        return model.validate(options).then(function () {
           expect(Joi.validate).to.have.been.calledWith(model.attributes, model.schema, options);
+        });
+      });
+
+      it('adds timestamps to the schema', function () {
+        model.schema = {};
+        return model.validate().then(function () {
+          expect(model.schema).to.have.keys('created_at', 'updated_at');
+        });
+      });
+
+      it('does not add timestamp fields to the schema is !hasTimestamps', function () {
+        model.schema = {};
+        model.hasTimestamps = false;
+        return model.validate().then(function () {
+          expect(model.schema).to.not.have.keys('created_at', 'updated_at');
         });
       });
 
@@ -82,7 +96,7 @@ describe('Model', function () {
         };
         model.set('numeric', '123');
         sinon.spy(model, 'set');
-        return model.validate().finally(function () {
+        return model.validate().then(function () {
           expect(model.set).to.have.been.calledWithMatch({
             numeric: 123
           });
@@ -98,7 +112,7 @@ describe('Model', function () {
       });
 
       it('skips schema validation if !model.schema', function () {
-        return model.validate().finally(function () {
+        return model.validate().then(function () {
           expect(Joi.validate).to.not.have.been.called;
         });
       });
@@ -106,7 +120,7 @@ describe('Model', function () {
       it('calls all custom validators', function () {
         var validator = sinon.spy();
         model.validators.push(validator);
-        return model.validate().finally(function () {
+        return model.validate().then(function () {
           expect(validator).to.have.been.calledOn(model);
         });
       });

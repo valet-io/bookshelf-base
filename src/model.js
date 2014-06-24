@@ -40,6 +40,12 @@ module.exports = function (BaseModel) {
         .bind(this)
         .then(function () {
           if (!schema) return;
+          if (this.hasTimestamps && !schema.created_at) {
+            _.extend(schema, {
+              created_at: Joi.date(),
+              updated_at: Joi.date()
+            });
+          }
           return Promise.promisify(Joi.validate)(this.attributes, this.schema, options);
         })
         .error(function (e) {
